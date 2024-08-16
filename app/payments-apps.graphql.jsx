@@ -9,6 +9,7 @@ import {
   REJECT,
   PENDING
 } from "./payments.repository";
+
 /**
  * Client to interface with the Payments Apps GraphQL API.
  *
@@ -19,24 +20,135 @@ import {
  * refundSessionReject: Rejects the given refund session.
  */
 export default class PaymentsAppsClient {
-    constructor(shop, accessToken, type) {
-        this.shop = shop;
-        this.type = type || PAYMENT; // default
-        this.accessToken = accessToken;
-        this.resolveMutation = "";
-        this.rejectMutation = "";
-        this.pendingMutation = "";
-        this.redirectMutation = "";
-        this.confirmMutation = "";
-        this.ordernoteupdate = "";
-        this.dependencyInjector(type);
-    
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        this.tomorrow = tomorrow;
-    }
+  constructor(shop, accessToken, type) {
+    this.shop = shop;
+    this.type = type || PAYMENT; // default
+    this.accessToken = accessToken;
+    this.resolveMutation = "";
+    this.rejectMutation = "";
+    this.pendingMutation = "";
+    this.redirectMutation = "";
+    this.confirmMutation = "";
+    this.ordernoteupdate = "";
+    this.dependencyInjector(type);
 
-    /**
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.tomorrow = tomorrow;
+  }
+
+  /**
+   * Generic session resolution function
+   * @param {*} session the session to resolve upon
+   * @returns the response body from the Shopify Payments Apps API
+   */
+  async resolveSession(session) {
+    const { id, gid, kind } = session;
+    const payload = { id: gid };
+
+    const response = await this.#perform(schema[this.resolveMutation], payload);
+    const responseData = response[this.resolveMutation]
+    //if (responseData?.userErrors?.length === 0) await this.update?.(id, RESOLVE);
+
+    return responseData;
+  }
+
+  /**
+   * Generic session rejection function
+   * @param {*} session the session to reject upon
+   * @returns the response body from the Shopify Payments Apps API
+   */
+  async rejectSession(session, { reasonCode = "PROCESSING_ERROR" } = {}) {
+    const { id, gid } = session;
+    const payload = {
+      id: gid,
+      reason: {
+        code: reasonCode,
+        merchantMessage: "The session was rejected."
+      }
+    }
+    if (session.threeDSecureAuthentication) payload['authentication'] = JSON.parse(session.threeDSecureAuthentication)
+
+    const response = await this.#perform(schema[this.rejectMutation], payload)
+    const responseData = response[this.rejectMutation]
+    if (responseData?.userErrors?.length === 0) await this.update?.(id, REJECT);
+
+    return responseData;
+  }
+
+  /**
+   * Generic session pending function
+   * @param {*} session the session to pend
+   * @returns the response body from the Shopify Payments Apps API
+   */
+  async pendSession({ id, gid }) {
+    if (this.type !== PAYMENT) throw new Error("Cannot pend a session for this client");
+
+    const response = await this.#perform(schema[this.pendingMutation], {
+      id: gid,
+      pendingExpiresAt: this.tomorrow.toISOString(),
+      reason: "PARTNER_ACTION_REQUIRED"
+    });
+    const responseData = response[this.pendingMutation];
+    if (responseData?.userErrors?.length === 0) await this.update?.(id, PENDING);
+
+    return responseData;
+  }
+
+  /**
+   * Mutation to redirect buyer to 3DS Iframe
+   * @param {*} session the session to redirect upon
+   * @param {string} redirectUrl is the url we will redirect to for 3DS authentication
+   * @returns the response body from the Shopify Payments Apps API
+   */
+  async redirectSession({ id, gid }, redirectUrl) {
+    const response = await this.#perform(schema[this.redirectMutation], {
+      id: gid,
+      redirectUrl: redirectUrl
+    });
+    const responseData = response[this.redirectMutation]
+    if (responseData?.userErrors?.length === 0) await this.update?.(id, RESOLVE);
+
+    return responseData;
+  }
+
+  /**
+   * Mutation to confirm inventory (often following 3DS)
+   * @param {*} session the session to confirm
+   * @returns the response body from the Shopify Payments Apps API
+   */
+  async confirmSession({ id, gid }) {
+    const response = await this.#perform(schema[this.confirmMutation], { id: gid });
+    const responseData = response[this.confirmMutation];
+
+    if (responseData?.userErrors?.length === 0) await this.update?.(id, RESOLVE);
+
+    return responseData;
+  }
+
+  async orderNoteUpdate({ id, gid }, data) {
+    let {x_amount,x_response, x_ref_payco } = data;
+    const note = 
+    ` ref_payco ${x_ref_payco}\n
+      monto ${x_amount}\n
+      estado ${x_response}
+    `;
+
+    const payload = {
+      input: {
+        id: gid,
+        note: note
+      }
+    }
+    const response = await this.#perform(schema[this.ordernoteupdate],  payload);
+    const responseData = response[this.ordernoteupdate];
+
+    if (responseData?.userErrors?.length === 0) await this.update?.(id, RESOLVE);
+
+    return responseData;
+  }
+
+  /**
    * Client perform function. Calls Shopify Payments Apps API.
    * @param {*} query the query to run
    * @param {*} variables the variables to pass
@@ -65,48 +177,47 @@ export default class PaymentsAppsClient {
     return response.ok ? responseBody.data : null
   }
 
-    async paymentsAppConfigure(externalHandle, ready) {
-        const response = await this.#perform(schema.paymentsAppConfigure, { externalHandle, ready })
-        return response?.paymentsAppConfigure
-    }
+  async paymentsAppConfigure(externalHandle, ready) {
+    const response = await this.#perform(schema.paymentsAppConfigure, { externalHandle, ready })
+    return response?.paymentsAppConfigure
+  }
 
-    /**
-     * Function that injects the dependencies for this client based on the session type
-     * @param {'payment' | 'refund' | 'capture' | 'void'} type
-     * @returns
-     */
-    dependencyInjector(type) {
-      switch(type) {
-        case PAYMENT:
-          this.resolveMutation = "paymentSessionResolve"
-          this.rejectMutation = "paymentSessionReject"
-          this.pendingMutation = "paymentSessionPending"
-          this.redirectMutation = "paymentSessionRedirect"
-          this.confirmMutation = "paymentSessionConfirm"
-          this.ordernoteupdate = "orderUpdate"
-          this.update = updatePaymentSessionStatus
-          break;
-        case REFUND:
-          this.resolveMutation = "refundSessionResolve"
-          this.rejectMutation = "refundSessionReject"
-          this.update = updateRefundSessionStatus
-          break;
-        case CAPTURE:
-          this.resolveMutation = "captureSessionResolve"
-          this.rejectMutation = "captureSessionReject"
-          this.update = updateCaptureSessionStatus
-          break;
-        case VOID:
-          this.resolveMutation = "voidSessionResolve"
-          this.rejectMutation = "voidSessionReject"
-          this.update = updateVoidSessionStatus
-          break;
-      }
+  /**
+   * Function that injects the dependencies for this client based on the session type
+   * @param {'payment' | 'refund' | 'capture' | 'void'} type
+   * @returns
+   */
+  dependencyInjector(type) {
+    switch(type) {
+      case PAYMENT:
+        this.resolveMutation = "paymentSessionResolve"
+        this.rejectMutation = "paymentSessionReject"
+        this.pendingMutation = "paymentSessionPending"
+        this.redirectMutation = "paymentSessionRedirect"
+        this.confirmMutation = "paymentSessionConfirm"
+        this.ordernoteupdate = "orderUpdate"
+        this.update = updatePaymentSessionStatus
+        break;
+      case REFUND:
+        this.resolveMutation = "refundSessionResolve"
+        this.rejectMutation = "refundSessionReject"
+        this.update = updateRefundSessionStatus
+        break;
+      case CAPTURE:
+        this.resolveMutation = "captureSessionResolve"
+        this.rejectMutation = "captureSessionReject"
+        this.update = updateCaptureSessionStatus
+        break;
+      case VOID:
+        this.resolveMutation = "voidSessionResolve"
+        this.rejectMutation = "voidSessionReject"
+        this.update = updateVoidSessionStatus
+        break;
     }
+  }
 }
 
-export const PAYMENT = "payment";
-export const REFUND = "refund";
-export const CAPTURE = "capture";
-export const VOID = "void";
-
+export const PAYMENT = "payment"
+export const REFUND = "refund"
+export const CAPTURE = "capture"
+export const VOID = "void"
