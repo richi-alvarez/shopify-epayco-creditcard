@@ -73,7 +73,7 @@ export const action = async ({ request }) => {
   await getOrCreateConfiguration(session.id, config);
 
   const client = new PaymentsAppsClient(session.shop, session.accessToken);
-  const response = await client.paymentsAppConfigure('credit-card-pago-con-epayco', true);
+  const response = await client.paymentsAppConfigure('epayco-credit-card-payment', true);
 
   const userErrors = response.userErrors || [];
 

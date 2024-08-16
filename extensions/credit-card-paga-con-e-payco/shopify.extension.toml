@@ -3,8 +3,8 @@
 api_version = "2024-04"
 
 [[extensions]]
-name = "Credit card"
-handle = "credit-card"
+name = "Credit card - Paga con ePayco"
+handle = "credit-card-paga-con-epayco"
 type = "payments_extension"
 
 
