@@ -3,7 +3,7 @@
 client_id = "783750e114e1a99798fa349f4ec94e90"
 name = "Credit card - Paga con ePayco"
 handle = "credit-card-pago-con-epayco"
-application_url = "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com"
+application_url = "https://obtaining-intelligent-voters-essentials.trycloudflare.com"
 embedded = false
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_orders,write_payment_gateways,write_payment_sessions"
 
 [auth]
 redirect_urls = [
-  "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/auth/callback",
-  "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/auth/shopify/callback",
-  "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/api/auth/callback"
+  "https://obtaining-intelligent-voters-essentials.trycloudflare.com/auth/callback",
+  "https://obtaining-intelligent-voters-essentials.trycloudflare.com/auth/shopify/callback",
+  "https://obtaining-intelligent-voters-essentials.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
