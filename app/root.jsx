@@ -15,14 +15,12 @@ import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
 import '@shopify/polaris/build/esm/styles.css';
 import { boundary } from "@shopify/shopify-app-remix";
 import { json } from "@remix-run/node";
-import polarisTranslation from "@shopify/polaris/locales/en.json";
  
 //export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }) => {
   return json({
-    //polarisTranslations: require("@shopify/polaris/locales/en.json"),
-    polarisTranslations: polarisTranslation,
+    polarisTranslations: require("@shopify/polaris/locales/en.json"),
     apiKey: process.env.SHOPIFY_API_KEY,
   });
 }

@@ -57,5 +57,15 @@
   },
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "workspaces": {
+    "packages": [
+      "web",
+      "web/frontend",
+      "extensions/*"
+    ]
+  },
+  "trustedDependencies": [
+    "@shopify/plugin-cloudflare"
+  ]
 }
