@@ -9,11 +9,11 @@ type = "payments_extension"
 
 
 merchant_label = "Credit card - Paga con ePayco"
-payment_session_url = "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/app/payment_session"
-refund_session_url = "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/app/refund_session"
-capture_session_url = "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/app/capture_session"
-void_session_url = "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/app/void_session"
-confirmation_callback_url = "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/app/confirm_session"
+payment_session_url = "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/app/payment_session"
+refund_session_url = "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/app/refund_session"
+capture_session_url = "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/app/capture_session"
+void_session_url = "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/app/void_session"
+confirmation_callback_url = "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/app/confirm_session"
 # List of ISO 3166 (alpha-2) country codes your app is available for installation by merchants. Learn more:
 # https://www.iso.org/iso-3166-country-codes.html
 supported_countries = [
