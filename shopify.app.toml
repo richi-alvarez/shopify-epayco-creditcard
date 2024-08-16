@@ -1,0 +1,29 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "783750e114e1a99798fa349f4ec94e90"
+name = "Credit card - Paga con ePayco"
+handle = "credit-card-pago-con-epayco"
+application_url = "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com"
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "my-epayco.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_orders,write_payment_gateways,write_payment_sessions"
+
+[auth]
+redirect_urls = [
+  "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/auth/callback",
+  "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/auth/shopify/callback",
+  "https://shopify-epayco-creditcard-277476b7083b.herokuapp.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-07"
+
+[pos]
+embedded = false
