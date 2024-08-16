@@ -2,9 +2,9 @@
 
 client_id = "783750e114e1a99798fa349f4ec94e90"
 name = "Credit card - Paga con ePayco"
-handle = "credit-card-pago-con-epayco"
-application_url = "https://obtaining-intelligent-voters-essentials.trycloudflare.com"
-embedded = false
+handle = "credit-card-paga-con-epayco"
+application_url = "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/"
+embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
@@ -17,9 +17,9 @@ scopes = "read_orders,write_payment_gateways,write_payment_sessions"
 
 [auth]
 redirect_urls = [
-  "https://obtaining-intelligent-voters-essentials.trycloudflare.com/auth/callback",
-  "https://obtaining-intelligent-voters-essentials.trycloudflare.com/auth/shopify/callback",
-  "https://obtaining-intelligent-voters-essentials.trycloudflare.com/api/auth/callback"
+  "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/auth/callback",
+  "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/auth/shopify/callback",
+  "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/api/auth/callback"
 ]
 
 [webhooks]
