@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "021582f85be8d7ea1c4303e69a50fc94"
+client_id = "783750e114e1a99798fa349f4ec94e90"
 name = "epayco credit card payment"
-handle = "epayco-credit-card-payment"
+handle = "epayco-credit-card"
 application_url = "https://rocky-earth-61775-f9eaf0d4e6df.herokuapp.com/"
 embedded = false
 
